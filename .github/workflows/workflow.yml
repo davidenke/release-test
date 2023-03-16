@@ -84,7 +84,12 @@ jobs:
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
       - run: |
-          RELEASE_ASSET=$(npm pack --silent)
-          pnpm dlx release-it --no-npm.publish --github.release --github.assets="${RELEASE_ASSET}" --github.autoGenerate --git.commitMessage='chore: release v${version}' --git.pushArgs=--follow-tags --ci
+          pnpm dlx release-it --ci \
+                              --no-npm.publish \
+                              --github.release \
+                              --github.assets=$(npm pack --silent) \
+                              --github.autoGenerate \
+                              --git.commitMessage='chore: release v${version}' \
+                              --git.pushArgs=--follow-tags
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
