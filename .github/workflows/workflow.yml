@@ -60,22 +60,19 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{secrets.WCP_GITHUB_TOKEN}}
       - uses: actions/setup-node@v3
         with:
           cache: "npm"
-          node-version: 18.14.2
+          node-version: 18.15.0
       - uses: actions/download-artifact@v3
         with:
           name: latest
           path: dist
-      - name: Configure git
-        run: |
+      - run: |
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-      - name: Publish package
-        run: |
-          npx release-it --no-npm.publish --github.release --github.autoGenerate --git.commitMessage='chore: release v${version}' --git.pushArgs=--follow-tags --ci
+      - run: |
+          npx release-it --no-npm.publish --github.release --github.assets="${RELEASE_ASSET}" --github.autoGenerate --git.commitMessage='chore: release v${version}' --git.pushArgs=--follow-tags --ci
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          RELEASE_ASSET: $(npm pack --silent)
