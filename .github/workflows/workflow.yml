@@ -9,7 +9,31 @@ on:
       - main
 
 jobs:
+  try:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+      - run: echo "${{ github.event.repository.pulls_url }}"
+      - run: |
+          gh api --header 'Accept: application/vnd.github+json' --method GET /repos/${{ github.repository }}/pulls > pulls.json
+          cat pulls.json
+          jq '.[] | {id: .id}' pulls.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: echo $GITHUB_CONTEXT
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Read PR ids from GitHub
+        run: "curl https://api.github.com/repos/webcomponents-preview/client/pulls?state=open"
+      - name: Get list of releases from GitHub
+        run: ""
+
   lint:
+    if: 1 > 2
     name: Lint
     runs-on: ubuntu-latest
     steps:
